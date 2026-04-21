@@ -6,8 +6,8 @@ const products = [
     description:
       "Professional-grade LED light therapy mask with 7 color modes targeting acne, wrinkles, and dull skin. Used by celebrities and dermatologists worldwide. 20-minute daily treatments for visible results in 4 weeks.",
     costPrice: "18.50",
-    sellingPrice: "89.99",
-    profitMargin: "71.49",
+    sellingPrice: "37.99",
+    profitMargin: "19.49",
     category: "Beauty",
     imageUrl:
       "https://images.unsplash.com/photo-1616394584738-fc6e612e71b9?w=600&q=80",
@@ -24,8 +24,8 @@ const products = [
     description:
       "22-momme 100% pure mulberry silk pillowcase. Reduces sleep creases, prevents hair breakage, and keeps skin hydrated overnight. Dermatologist recommended for sensitive skin.",
     costPrice: "12.00",
-    sellingPrice: "54.99",
-    profitMargin: "42.99",
+    sellingPrice: "24.99",
+    profitMargin: "12.99",
     category: "Lifestyle",
     imageUrl:
       "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=600&q=80",
@@ -42,8 +42,8 @@ const products = [
     description:
       "Ergonomic posture corrector designed specifically for women. Adjustable straps, breathable material, invisible under clothing. Relieves back pain from desk work in days.",
     costPrice: "9.00",
-    sellingPrice: "39.99",
-    profitMargin: "30.99",
+    sellingPrice: "19.99",
+    profitMargin: "10.99",
     category: "Wellness",
     imageUrl:
       "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=600&q=80",
@@ -60,8 +60,8 @@ const products = [
     description:
       "Authentic rose quartz facial roller and gua sha set. Reduces puffiness, improves circulation, and enhances lymphatic drainage. Elevates your morning skincare ritual.",
     costPrice: "7.50",
-    sellingPrice: "34.99",
-    profitMargin: "27.49",
+    sellingPrice: "15.99",
+    profitMargin: "8.49",
     category: "Beauty",
     imageUrl:
       "https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?w=600&q=80",
@@ -78,8 +78,8 @@ const products = [
     description:
       "No-glue magnetic false lashes with precision applicator. 5-magnet technology for all-day hold. Reusable 30+ times. Achieve salon-quality lashes in under 2 minutes.",
     costPrice: "8.00",
-    sellingPrice: "42.99",
-    profitMargin: "34.99",
+    sellingPrice: "16.99",
+    profitMargin: "8.99",
     category: "Makeup",
     imageUrl:
       "https://images.unsplash.com/photo-1512207736890-6ffed8a84e8d?w=600&q=80",
@@ -96,8 +96,8 @@ const products = [
     description:
       "Premium neoprene waist trainer with 3-column hook closure and double boning. Accelerates core temperature for maximum sweat during workouts. Shapes and sculpts waist instantly.",
     costPrice: "14.00",
-    sellingPrice: "59.99",
-    profitMargin: "45.99",
+    sellingPrice: "28.99",
+    profitMargin: "14.99",
     category: "Fitness",
     imageUrl:
       "https://images.unsplash.com/photo-1518310383802-640c2de311b2?w=600&q=80",
@@ -114,8 +114,8 @@ const products = [
     description:
       "Professional silicone cupping therapy set for cellulite reduction and skin tightening. Creates deep tissue massage effect to stimulate circulation and break down fat cells.",
     costPrice: "11.00",
-    sellingPrice: "48.99",
-    profitMargin: "37.99",
+    sellingPrice: "22.99",
+    profitMargin: "11.99",
     category: "Wellness",
     imageUrl:
       "https://images.unsplash.com/photo-1607631568010-a87245c0daf8?w=600&q=80",
@@ -132,8 +132,8 @@ const products = [
     description:
       "Set of 5 fabric resistance bands with anti-slip design. Targets glutes, thighs, and hips. Perfect for home workouts, yoga, and pilates. Includes exercise guide.",
     costPrice: "10.00",
-    sellingPrice: "44.99",
-    profitMargin: "34.99",
+    sellingPrice: "20.99",
+    profitMargin: "10.99",
     category: "Fitness",
     imageUrl:
       "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=600&q=80",

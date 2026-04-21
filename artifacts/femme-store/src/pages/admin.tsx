@@ -35,6 +35,7 @@ async function apiCall<T = unknown>(path: string, options?: RequestInit): Promis
 
 const ADMIN_EMAIL = import.meta.env.VITE_ADMIN_EMAIL ?? "";
 const clerkAvailable = !!import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
+const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD ?? "admin123";
 
 type DashboardData = {
   summary: {
@@ -874,9 +875,49 @@ function ClerkAdminGuard() {
   return <AdminContent isAdmin={!!isAdmin} isLoaded={isLoaded} />;
 }
 
-export default function AdminPage() {
-  if (!clerkAvailable) {
-    return <AdminContent isAdmin={true} isLoaded={true} />;
+function PasswordAdminGate() {
+  const [input, setInput] = useState("");
+  const [authed, setAuthed] = useState(() => sessionStorage.getItem("admin_authed") === "1");
+  const [error, setError] = useState(false);
+
+  if (authed) return <AdminContent isAdmin={true} isLoaded={true} />;
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (input === ADMIN_PASSWORD) {
+      sessionStorage.setItem("admin_authed", "1");
+      setAuthed(true);
+      setError(false);
+    } else {
+      setError(true);
+    }
   }
-  return <ClerkAdminGuard />;
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-pink-50 to-purple-50">
+      <div className="bg-white rounded-2xl shadow-lg p-8 w-full max-w-sm">
+        <h1 className="text-2xl font-bold text-center mb-1">Admin Login</h1>
+        <p className="text-sm text-muted-foreground text-center mb-6">Enter your admin password to continue</p>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="admin-pass">Password</Label>
+            <Input
+              id="admin-pass"
+              type="password"
+              placeholder="Enter admin password"
+              value={input}
+              onChange={e => { setInput(e.target.value); setError(false); }}
+              autoFocus
+            />
+            {error && <p className="text-sm text-red-500">Incorrect password. Try again.</p>}
+          </div>
+          <Button type="submit" className="w-full">Sign In</Button>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+export default function AdminPage() {
+  return <PasswordAdminGate />;
 }

@@ -17,6 +17,7 @@ import Cart from "@/pages/cart";
 import Strategy from "@/pages/strategy";
 import SignInPage from "@/pages/sign-in";
 import SignUpPage from "@/pages/sign-up";
+import AdminPage from "@/pages/admin";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -112,19 +113,24 @@ function ClerkQueryClientCacheInvalidator() {
 
 function Router() {
   return (
-    <Layout>
-      <Switch>
-        <Route path="/" component={Home} />
-        <Route path="/products" component={Products} />
-        <Route path="/products/:id" component={ProductDetail} />
-        <Route path="/cart" component={Cart} />
-        <Route path="/strategy" component={Strategy} />
-        <Route path="/sign-in/*?" component={SignInPage} />
-        <Route path="/sign-up/*?" component={SignUpPage} />
-        <Route component={NotFound} />
-      </Switch>
-      <BackToTop />
-    </Layout>
+    <Switch>
+      <Route path="/admin" component={AdminPage} />
+      <Route>
+        <Layout>
+          <Switch>
+            <Route path="/" component={Home} />
+            <Route path="/products" component={Products} />
+            <Route path="/products/:id" component={ProductDetail} />
+            <Route path="/cart" component={Cart} />
+            <Route path="/strategy" component={Strategy} />
+            <Route path="/sign-in/*?" component={SignInPage} />
+            <Route path="/sign-up/*?" component={SignUpPage} />
+            <Route component={NotFound} />
+          </Switch>
+          <BackToTop />
+        </Layout>
+      </Route>
+    </Switch>
   );
 }
 

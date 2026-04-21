@@ -25,3 +25,48 @@ pnpm workspace monorepo using TypeScript. Each package manages its own dependenc
 - `pnpm --filter @workspace/api-server run dev` — run API server locally
 
 See the `pnpm-workspace` skill for workspace structure, TypeScript setup, and package details.
+
+## FemmeFlow Dropshipping Store
+
+A high-converting dropshipping storefront targeting women in fashion, beauty, accessories, and lifestyle.
+
+### Artifacts
+
+- **`artifacts/femme-store`** — React+Vite frontend storefront (previewPath: `/`)
+- **`artifacts/api-server`** — Express 5 backend API (previewPath: `/api`)
+
+### Features
+
+- 8 viral-potential women's products (LED mask, posture corrector, resistance bands, jade roller, magnetic lashes, waist trainer, cellulite massager, silk pillowcase)
+- High-converting product pages with urgency elements (stock meters, timers)
+- Social proof via seeded customer reviews
+- Shopping cart with session-based persistence
+- Checkout form with multiple payment method options (Wise/Payoneer, Crypto USDT, Bank Transfer)
+- Business strategy guide page (/strategy) with dropshipping playbook
+- Mobile-first warm rose/blush/gold design
+
+### Database Schema (lib/db/src/schema/)
+
+- `products` — product catalog with pricing, margins, viral metadata
+- `reviews` — customer reviews linked to products
+- `cart_items` — session-based shopping cart
+- `orders` — completed orders with JSONB items snapshot
+
+### API Endpoints (lib/api-spec/openapi.yaml)
+
+- `GET /api/products` — list products with optional category filter
+- `GET /api/products/trending` — trending/viral products
+- `GET /api/products/:id` — single product detail
+- `GET /api/catalog/summary` — store stats (total products, categories, ratings)
+- `GET /api/reviews?productId=X` — reviews for a product
+- `POST /api/reviews` — submit a review
+- `GET /api/cart?sessionId=X` — get cart by session
+- `POST /api/cart` — add item to cart
+- `DELETE /api/cart/item/:itemId` — remove item from cart
+- `POST /api/orders` — place an order (clears cart)
+
+### Important Notes
+
+- `lib/api-zod/src/index.ts` only exports from `./generated/api` (not `./generated/types`) to avoid duplicate export conflicts
+- Session IDs are generated in the browser and stored in localStorage
+- Product images use Unsplash URLs for demonstration

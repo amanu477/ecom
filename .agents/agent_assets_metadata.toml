@@ -1,0 +1,50 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "_gYQ8FmXCmDjUyCpvK5Du"
+uri = "file://artifacts/femme-store/public/images/led-mask.png"
+type = "image"
+title = "LED face mask product photo"
+
+[[generated]]
+id = "oZGKWUZzsvxkTgbTtD5-2"
+uri = "file://artifacts/femme-store/public/images/posture-corrector.png"
+type = "image"
+title = "Posture corrector product photo"
+
+[[generated]]
+id = "OH8ao91mJzXttMmlaZVWC"
+uri = "file://artifacts/femme-store/public/images/resistance-bands.png"
+type = "image"
+title = "Resistance bands set photo"
+
+[[generated]]
+id = "-1pBDsC5MyZCrXdY7siMG"
+uri = "file://artifacts/femme-store/public/images/jade-roller.png"
+type = "image"
+title = "Jade roller product photo"
+
+[[generated]]
+id = "GEp0KmmWfRQFYYNtQHmR3"
+uri = "file://artifacts/femme-store/public/images/magnetic-lashes.png"
+type = "image"
+title = "Magnetic lashes product photo"
+
+[[generated]]
+id = "77YPsR1dw1R6anY0-9aBs"
+uri = "file://artifacts/femme-store/public/images/waist-trainer.png"
+type = "image"
+title = "Waist trainer product photo"
+
+[[generated]]
+id = "Rq_LZODcjBTLgEpiN0PBl"
+uri = "file://artifacts/femme-store/public/images/massager.png"
+type = "image"
+title = "Anti cellulite massager photo"
+
+[[generated]]
+id = "Cy4c5hNTZ428k4rNFtWB3"
+uri = "file://artifacts/femme-store/public/images/silk-pillowcase.png"
+type = "image"
+title = "Silk pillowcase product photo"

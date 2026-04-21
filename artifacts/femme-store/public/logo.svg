@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60" fill="none">
+  <text x="0" y="46" font-family="Georgia, serif" font-size="42" font-weight="700" fill="#a3485d" letter-spacing="-1">FF</text>
+  <text x="58" y="46" font-family="Georgia, serif" font-size="28" font-weight="400" fill="#2d2424" letter-spacing="-0.5">emme</text>
+  <circle cx="183" cy="24" r="6" fill="#a3485d" opacity="0.3"/>
+  <circle cx="183" cy="24" r="3" fill="#a3485d"/>
+</svg>

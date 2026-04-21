@@ -1,16 +1,24 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
-import { ShoppingBag, Menu, X, ArrowRight } from "lucide-react";
+import { ShoppingBag, Menu, X, ArrowRight, User, LogOut, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useGetCart } from "@workspace/api-client-react";
 import { useSessionId } from "@/hooks/use-session-id";
 import { motion, AnimatePresence } from "framer-motion";
+import {
+  useUser,
+  useClerk,
+  SignInButton,
+  SignUpButton,
+} from "@clerk/react";
 
 export function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [location] = useLocation();
   const sessionId = useSessionId();
+  const { isSignedIn, user } = useUser();
+  const { signOut } = useClerk();
 
   const { data: cart } = useGetCart(
     { sessionId },
@@ -80,8 +88,41 @@ export function Header() {
               ))}
             </nav>
 
-            {/* Cart Icon */}
-            <div className="flex items-center justify-end flex-shrink-0">
+            {/* Right Side: Auth + Cart */}
+            <div className="flex items-center gap-2 flex-shrink-0">
+              {/* Auth area — desktop */}
+              <div className="hidden md:flex items-center gap-2">
+                {isSignedIn ? (
+                  <div className="flex items-center gap-3">
+                    <span className="text-sm text-muted-foreground">
+                      Hi, {user?.firstName || user?.emailAddresses?.[0]?.emailAddress?.split("@")[0]}
+                    </span>
+                    <button
+                      onClick={() => signOut()}
+                      className="flex items-center gap-1 text-xs text-muted-foreground hover:text-primary transition-colors"
+                      title="Sign out"
+                    >
+                      <LogOut className="w-4 h-4" />
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <SignInButton mode="modal">
+                      <button className="text-sm text-muted-foreground hover:text-primary transition-colors flex items-center gap-1">
+                        <LogIn className="w-4 h-4" />
+                        Sign in
+                      </button>
+                    </SignInButton>
+                    <SignUpButton mode="modal">
+                      <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90 text-xs px-3 py-1 h-8">
+                        Register
+                      </Button>
+                    </SignUpButton>
+                  </div>
+                )}
+              </div>
+
+              {/* Cart Icon */}
               <Link href="/cart" className="relative p-2 text-foreground hover:text-primary transition-colors group">
                 <ShoppingBag className="w-5 h-5 md:w-6 md:h-6" />
                 <AnimatePresence>
@@ -141,6 +182,45 @@ export function Header() {
                     <ArrowRight className="w-4 h-4 text-muted-foreground" />
                   </Link>
                 ))}
+                {/* Mobile auth section */}
+                <div className="pt-2 border-t border-border">
+                  {isSignedIn ? (
+                    <div className="space-y-4">
+                      <p className="text-sm text-muted-foreground flex items-center gap-2">
+                        <User className="w-4 h-4" />
+                        {user?.firstName || user?.emailAddresses?.[0]?.emailAddress?.split("@")[0]}
+                      </p>
+                      <button
+                        onClick={() => { signOut(); setIsMobileMenuOpen(false); }}
+                        className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors"
+                      >
+                        <LogOut className="w-4 h-4" />
+                        Sign out
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      <SignInButton mode="modal">
+                        <button
+                          onClick={() => setIsMobileMenuOpen(false)}
+                          className="flex items-center gap-2 text-base font-serif text-muted-foreground hover:text-foreground transition-colors w-full"
+                        >
+                          <LogIn className="w-4 h-4" />
+                          Sign in
+                        </button>
+                      </SignInButton>
+                      <SignUpButton mode="modal">
+                        <button
+                          onClick={() => setIsMobileMenuOpen(false)}
+                          className="flex items-center gap-2 text-base font-serif text-muted-foreground hover:text-foreground transition-colors w-full"
+                        >
+                          <User className="w-4 h-4" />
+                          Create account
+                        </button>
+                      </SignUpButton>
+                    </div>
+                  )}
+                </div>
               </div>
               <div className="p-4 border-t border-border bg-muted/30">
                 <Button asChild className="w-full bg-primary text-primary-foreground">

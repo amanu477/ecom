@@ -44,6 +44,7 @@ A high-converting dropshipping storefront targeting women in fashion, beauty, ac
 - Checkout form with multiple payment method options (Wise/Payoneer, Crypto USDT, Bank Transfer)
 - Business strategy guide page (/strategy) with dropshipping playbook
 - Mobile-first warm rose/blush/gold design
+- Clerk authentication: Sign In / Register buttons in header (modal popups), dedicated /sign-in and /sign-up routes for OAuth fallback; signed-in header shows user name + sign-out link
 
 ### Database Schema (lib/db/src/schema/)
 

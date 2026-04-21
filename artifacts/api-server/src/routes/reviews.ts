@@ -22,7 +22,12 @@ router.get("/reviews", async (req, res): Promise<void> => {
     .where(eq(reviewsTable.productId, parsed.data.productId))
     .orderBy(desc(reviewsTable.createdAt));
 
-  res.json(ListReviewsResponse.parse(reviews));
+  const mapped = reviews.map((r) => ({
+    ...r,
+    avatarUrl: r.avatarUrl ?? undefined,
+  }));
+
+  res.json(ListReviewsResponse.parse(mapped));
 });
 
 router.post("/reviews", async (req, res): Promise<void> => {

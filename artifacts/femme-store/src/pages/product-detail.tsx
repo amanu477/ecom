@@ -11,7 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
 import { 
   Star, TrendingUp, ShieldCheck, Truck, RotateCcw, 
-  Minus, Plus, ShoppingBag, Eye, Heart
+  Minus, Plus, ShoppingBag, Eye, Heart, Sparkles
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";

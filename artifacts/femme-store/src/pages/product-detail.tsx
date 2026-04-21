@@ -148,11 +148,6 @@ export default function ProductDetail() {
                   <TrendingUp className="w-3 h-3 mr-1" /> Trending
                 </Badge>
               )}
-              {product.targetAudience && (
-                <Badge variant="secondary" className="text-xs uppercase tracking-widest">
-                  {product.targetAudience}
-                </Badge>
-              )}
             </div>
 
             <h1 className="text-4xl md:text-5xl font-serif font-medium leading-tight mb-4 text-foreground">
@@ -173,10 +168,6 @@ export default function ProductDetail() {
 
             <div className="flex items-end gap-4 mb-6">
               <span className="text-4xl font-bold text-foreground">${product.sellingPrice.toFixed(2)}</span>
-              <div className="flex flex-col">
-                <span className="text-lg text-muted-foreground line-through">${(product.sellingPrice * 1.4).toFixed(2)}</span>
-                <span className="text-sm font-semibold text-primary">Save 40% Today</span>
-              </div>
             </div>
 
             <p className="text-base text-muted-foreground leading-relaxed mb-8">
@@ -261,18 +252,12 @@ export default function ProductDetail() {
       <div className="border-t border-border/50 bg-muted/20 pb-24">
         <div className="container mx-auto px-4 py-16">
           <Tabs defaultValue="details" className="max-w-4xl mx-auto">
-            <TabsList className="grid w-full grid-cols-3 bg-transparent h-auto p-0 mb-12 border-b border-border rounded-none">
+            <TabsList className="grid w-full grid-cols-2 bg-transparent h-auto p-0 mb-12 border-b border-border rounded-none">
               <TabsTrigger 
                 value="details" 
                 className="py-4 text-base font-medium rounded-none data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none"
               >
                 The Details
-              </TabsTrigger>
-              <TabsTrigger 
-                value="why" 
-                className="py-4 text-base font-medium rounded-none data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none"
-              >
-                Why It's Viral
               </TabsTrigger>
               <TabsTrigger 
                 value="reviews" 
@@ -296,24 +281,6 @@ export default function ProductDetail() {
               </ul>
             </TabsContent>
             
-            <TabsContent value="why" className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-              <div className="bg-card p-8 rounded-2xl border border-border shadow-sm">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="p-3 bg-primary/10 text-primary rounded-xl">
-                    <Sparkles className="w-6 h-6" />
-                  </div>
-                  <h3 className="text-2xl font-serif font-medium text-foreground">The TikTok Sensation</h3>
-                </div>
-                <p className="text-lg text-muted-foreground leading-relaxed italic border-l-4 border-primary pl-4 mb-6">
-                  "{product.viralReason || 'This product solves a universal problem with an elegant, highly visual solution that looks incredible on camera.'}"
-                </p>
-                <div className="flex gap-4">
-                  <Badge variant="secondary">#tiktokmademebuyit</Badge>
-                  <Badge variant="secondary">#musthave</Badge>
-                  <Badge variant="secondary">#{product.category.toLowerCase()}</Badge>
-                </div>
-              </div>
-            </TabsContent>
             
             <TabsContent value="reviews" className="animate-in fade-in slide-in-from-bottom-4 duration-500">
               <div className="flex flex-col md:flex-row gap-12">

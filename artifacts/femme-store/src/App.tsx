@@ -14,7 +14,6 @@ import Home from "@/pages/home";
 import Products from "@/pages/products";
 import ProductDetail from "@/pages/product-detail";
 import Cart from "@/pages/cart";
-import Strategy from "@/pages/strategy";
 import SignInPage from "@/pages/sign-in";
 import SignUpPage from "@/pages/sign-up";
 import AdminPage from "@/pages/admin";
@@ -118,7 +117,6 @@ function Router() {
             <Route path="/products" component={Products} />
             <Route path="/products/:id" component={ProductDetail} />
             <Route path="/cart" component={Cart} />
-            <Route path="/strategy" component={Strategy} />
             <Route path="/sign-in/*?" component={SignInPage} />
             <Route path="/sign-up/*?" component={SignUpPage} />
             <Route component={NotFound} />

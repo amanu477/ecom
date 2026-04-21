@@ -750,46 +750,76 @@ function AdminContent({ isAdmin, isLoaded }: { isAdmin: boolean; isLoaded: boole
                   </CardContent>
                 </Card>
               ) : (
-                <div className="grid md:grid-cols-2 gap-4">
-                  {pendingProducts.map((p) => (
-                    <Card key={p.id} className={`border-0 shadow-sm overflow-hidden ${p.status !== "pending" ? "opacity-60" : ""}`}>
-                      <div className="flex gap-4 p-4">
-                        <img src={p.imageUrl} alt={p.name} className="h-20 w-20 rounded-xl object-cover shrink-0" />
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-start justify-between gap-2 mb-1">
-                            <h3 className="font-semibold text-sm leading-tight">{p.name}</h3>
-                            <span className={`text-xs px-2 py-0.5 rounded-full font-medium shrink-0 ${statusColors[p.status] ?? "bg-gray-100 text-gray-700"}`}>{p.status}</span>
-                          </div>
-                          <p className="text-xs text-muted-foreground mb-2 line-clamp-2">{p.description}</p>
-                          <div className="flex flex-wrap gap-2 text-xs mb-2">
-                            <Badge variant="outline">{p.category}</Badge>
-                            <span className="bg-green-50 text-green-700 px-2 py-0.5 rounded-full font-medium">
-                              {fmt(p.sellingPrice)} sell · {p.profitMargin.toFixed(0)}% margin
+                <div className="space-y-6">
+                  {Object.entries(
+                    pendingProducts.reduce<Record<string, Record<string, typeof pendingProducts>>>((acc, p) => {
+                      const cat = p.category || "Uncategorized";
+                      const src = p.source || "automation";
+                      if (!acc[cat]) acc[cat] = {};
+                      if (!acc[cat][src]) acc[cat][src] = [];
+                      acc[cat][src].push(p);
+                      return acc;
+                    }, {})
+                  ).map(([category, bySource]) => (
+                    <div key={category}>
+                      <h3 className="text-sm font-semibold uppercase tracking-widest text-[#a3485d] mb-3 flex items-center gap-2">
+                        <Package className="h-4 w-4" /> {category}
+                      </h3>
+                      {Object.entries(bySource).map(([source, products]) => (
+                        <div key={source} className="mb-4">
+                          <div className="flex items-center gap-2 mb-2">
+                            <span className="text-xs bg-muted px-2 py-0.5 rounded-full font-medium text-muted-foreground">
+                              Source: {source}
                             </span>
-                            {p.trendScore > 0 && (
-                              <span className="bg-purple-50 text-purple-700 px-2 py-0.5 rounded-full font-medium">
-                                <TrendingUp className="h-3 w-3 inline mr-0.5" />Score {p.trendScore}
-                              </span>
-                            )}
+                            <span className="text-xs text-muted-foreground">{products.length} product{products.length !== 1 ? "s" : ""}</span>
                           </div>
-                          {p.viralReason && (
-                            <p className="text-xs text-muted-foreground italic line-clamp-1">💡 {p.viralReason}</p>
-                          )}
+                          <div className="grid md:grid-cols-2 gap-3">
+                            {products.map((p) => (
+                              <Card key={p.id} className={`border-0 shadow-sm overflow-hidden ${p.status !== "pending" ? "opacity-60" : ""}`}>
+                                <div className="flex gap-4 p-4">
+                                  <img src={p.imageUrl} alt={p.name} className="h-20 w-20 rounded-xl object-cover shrink-0" />
+                                  <div className="flex-1 min-w-0">
+                                    <div className="flex items-start justify-between gap-2 mb-1">
+                                      <h3 className="font-semibold text-sm leading-tight">{p.name}</h3>
+                                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium shrink-0 ${statusColors[p.status] ?? "bg-gray-100 text-gray-700"}`}>{p.status}</span>
+                                    </div>
+                                    <p className="text-xs text-muted-foreground mb-2 line-clamp-2">{p.description}</p>
+                                    <div className="flex flex-wrap gap-2 text-xs mb-2">
+                                      <span className="bg-green-50 text-green-700 px-2 py-0.5 rounded-full font-medium">
+                                        {fmt(p.sellingPrice)} sell · {p.profitMargin.toFixed(0)}% margin
+                                      </span>
+                                      {p.trendScore > 0 && (
+                                        <span className="bg-purple-50 text-purple-700 px-2 py-0.5 rounded-full font-medium">
+                                          <TrendingUp className="h-3 w-3 inline mr-0.5" />Score {p.trendScore}
+                                        </span>
+                                      )}
+                                    </div>
+                                    {p.viralReason && (
+                                      <p className="text-xs text-muted-foreground italic line-clamp-1">💡 {p.viralReason}</p>
+                                    )}
+                                    {p.targetAudience && (
+                                      <p className="text-xs text-muted-foreground line-clamp-1">👥 {p.targetAudience}</p>
+                                    )}
+                                  </div>
+                                </div>
+                                {p.status === "pending" && (
+                                  <div className="border-t border-border px-4 py-3 flex gap-2 bg-muted/20">
+                                    <Button size="sm" className="flex-1 bg-green-600 hover:bg-green-700 text-white h-8" onClick={() => approveProduct(p.id)} disabled={loading[`approve-${p.id}`]}>
+                                      <CheckCircle className="h-3.5 w-3.5 mr-1.5" />
+                                      {loading[`approve-${p.id}`] ? "Approving..." : "Approve & Publish"}
+                                    </Button>
+                                    <Button size="sm" variant="outline" className="flex-1 h-8 text-red-600 border-red-200 hover:bg-red-50" onClick={() => rejectProduct(p.id)} disabled={loading[`reject-${p.id}`]}>
+                                      <XCircle className="h-3.5 w-3.5 mr-1.5" />
+                                      {loading[`reject-${p.id}`] ? "Rejecting..." : "Reject"}
+                                    </Button>
+                                  </div>
+                                )}
+                              </Card>
+                            ))}
+                          </div>
                         </div>
-                      </div>
-                      {p.status === "pending" && (
-                        <div className="border-t border-border px-4 py-3 flex gap-2 bg-muted/20">
-                          <Button size="sm" className="flex-1 bg-green-600 hover:bg-green-700 text-white h-8" onClick={() => approveProduct(p.id)} disabled={loading[`approve-${p.id}`]}>
-                            <CheckCircle className="h-3.5 w-3.5 mr-1.5" />
-                            {loading[`approve-${p.id}`] ? "Approving..." : "Approve & Publish"}
-                          </Button>
-                          <Button size="sm" variant="outline" className="flex-1 h-8 text-red-600 border-red-200 hover:bg-red-50" onClick={() => rejectProduct(p.id)} disabled={loading[`reject-${p.id}`]}>
-                            <XCircle className="h-3.5 w-3.5 mr-1.5" />
-                            {loading[`reject-${p.id}`] ? "Rejecting..." : "Reject"}
-                          </Button>
-                        </div>
-                      )}
-                    </Card>
+                      ))}
+                    </div>
                   ))}
                 </div>
               )}

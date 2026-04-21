@@ -118,7 +118,6 @@ export function Header() {
     { href: "/products", label: "Shop All" },
     { href: "/products?category=Beauty", label: "Beauty" },
     { href: "/products?category=Fashion", label: "Fashion" },
-    { href: "/strategy", label: "Strategy" },
   ];
 
   return (

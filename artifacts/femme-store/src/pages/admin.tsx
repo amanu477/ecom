@@ -34,15 +34,7 @@ async function apiCall<T = unknown>(path: string, options?: RequestInit): Promis
 }
 
 const ADMIN_EMAIL = import.meta.env.VITE_ADMIN_EMAIL ?? "";
-
-function useIsAdmin() {
-  const { user, isLoaded } = useUser();
-  if (!isLoaded || !user) return { isAdmin: false, isLoaded };
-  const role = (user.publicMetadata as any)?.role;
-  const email = user.primaryEmailAddress?.emailAddress ?? "";
-  const isAdmin = role === "admin" || (ADMIN_EMAIL && email === ADMIN_EMAIL);
-  return { isAdmin: !!isAdmin, isLoaded };
-}
+const clerkAvailable = !!import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
 type DashboardData = {
   summary: {
@@ -301,8 +293,7 @@ function ProductForm({ initial, onSave, onClose }: { initial?: Partial<Product>;
   );
 }
 
-export default function AdminPage() {
-  const { isAdmin, isLoaded } = useIsAdmin();
+function AdminContent({ isAdmin, isLoaded }: { isAdmin: boolean; isLoaded: boolean }) {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
 
@@ -873,4 +864,19 @@ export default function AdminPage() {
       </div>
     </div>
   );
+}
+
+function ClerkAdminGuard() {
+  const { user, isLoaded } = useUser();
+  const role = (user?.publicMetadata as any)?.role;
+  const email = user?.primaryEmailAddress?.emailAddress ?? "";
+  const isAdmin = isLoaded && (role === "admin" || (ADMIN_EMAIL && email === ADMIN_EMAIL));
+  return <AdminContent isAdmin={!!isAdmin} isLoaded={isLoaded} />;
+}
+
+export default function AdminPage() {
+  if (!clerkAvailable) {
+    return <AdminContent isAdmin={true} isLoaded={true} />;
+  }
+  return <ClerkAdminGuard />;
 }

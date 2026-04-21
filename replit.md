@@ -71,3 +71,6 @@ A high-converting dropshipping storefront targeting women in fashion, beauty, ac
 - `lib/api-zod/src/index.ts` only exports from `./generated/api` (not `./generated/types`) to avoid duplicate export conflicts
 - Session IDs are generated in the browser and stored in localStorage
 - Product images use Unsplash URLs for demonstration
+- Vite dev server (`artifacts/femme-store/vite.config.ts`) proxies `/api/*` to `http://localhost:8080` — without this, browser fetches `/api/*` as relative URLs hitting the Vite SPA server which returns HTML (not JSON), causing runtime crashes
+- `resolve.dedupe` includes `@tanstack/react-query` to prevent duplicate React instances across workspace packages
+- Null DB fields (supplierUrl, viralReason, targetAudience, tags) are mapped to `undefined` in `artifacts/api-server/src/routes/products.ts` via `mapProduct()` to satisfy Zod schemas

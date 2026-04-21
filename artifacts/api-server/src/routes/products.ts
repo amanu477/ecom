@@ -11,6 +11,22 @@ import {
 
 const router: IRouter = Router();
 
+type RawProduct = typeof productsTable.$inferSelect;
+
+function mapProduct(p: RawProduct) {
+  return {
+    ...p,
+    costPrice: parseFloat(p.costPrice),
+    sellingPrice: parseFloat(p.sellingPrice),
+    profitMargin: parseFloat(p.profitMargin),
+    rating: parseFloat(p.rating ?? "4.5"),
+    viralReason: p.viralReason ?? undefined,
+    targetAudience: p.targetAudience ?? undefined,
+    supplierUrl: p.supplierUrl ?? undefined,
+    tags: p.tags ?? undefined,
+  };
+}
+
 router.get("/products", async (req, res): Promise<void> => {
   const parsed = ListProductsQueryParams.safeParse(req.query);
   if (!parsed.success) {
@@ -28,15 +44,7 @@ router.get("/products", async (req, res): Promise<void> => {
     .limit(limit ?? 20)
     .offset(offset ?? 0);
 
-  const mapped = products.map((p) => ({
-    ...p,
-    costPrice: parseFloat(p.costPrice),
-    sellingPrice: parseFloat(p.sellingPrice),
-    profitMargin: parseFloat(p.profitMargin),
-    rating: parseFloat(p.rating ?? "4.5"),
-  }));
-
-  res.json(ListProductsResponse.parse(mapped));
+  res.json(ListProductsResponse.parse(products.map(mapProduct)));
 });
 
 router.get("/products/trending", async (_req, res): Promise<void> => {
@@ -47,15 +55,7 @@ router.get("/products/trending", async (_req, res): Promise<void> => {
     .orderBy(desc(productsTable.rating))
     .limit(6);
 
-  const mapped = products.map((p) => ({
-    ...p,
-    costPrice: parseFloat(p.costPrice),
-    sellingPrice: parseFloat(p.sellingPrice),
-    profitMargin: parseFloat(p.profitMargin),
-    rating: parseFloat(p.rating ?? "4.5"),
-  }));
-
-  res.json(GetTrendingProductsResponse.parse(mapped));
+  res.json(GetTrendingProductsResponse.parse(products.map(mapProduct)));
 });
 
 router.get("/products/:id", async (req, res): Promise<void> => {
@@ -76,15 +76,7 @@ router.get("/products/:id", async (req, res): Promise<void> => {
     return;
   }
 
-  res.json(
-    GetProductResponse.parse({
-      ...product,
-      costPrice: parseFloat(product.costPrice),
-      sellingPrice: parseFloat(product.sellingPrice),
-      profitMargin: parseFloat(product.profitMargin),
-      rating: parseFloat(product.rating ?? "4.5"),
-    })
-  );
+  res.json(GetProductResponse.parse(mapProduct(product)));
 });
 
 export default router;

@@ -95,7 +95,7 @@ export default function Home() {
             </div>
             <div className="flex items-center gap-2">
               <Star className="w-5 h-5 text-accent fill-current" />
-              <span>{summary?.avgRating.toFixed(1) || "4.9"}/5 Average Rating</span>
+              <span>{summary?.avgRating != null ? summary.avgRating.toFixed(1) : "4.9"}/5 Average Rating</span>
             </div>
           </div>
         </div>

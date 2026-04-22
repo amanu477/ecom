@@ -1,10 +1,16 @@
 import { db, pendingProductsTable } from "@workspace/db";
 import OpenAI from "openai";
 
-const openai = new OpenAI({
-  baseURL: "https://api.groq.com/openai/v1",
-  apiKey: process.env.GROQ_API_KEY,
-});
+function getOpenAIClient(): OpenAI {
+  const apiKey = process.env.GROQ_API_KEY;
+  if (!apiKey) {
+    throw new Error("GROQ_API_KEY environment variable is not set. AI product discovery is unavailable.");
+  }
+  return new OpenAI({
+    baseURL: "https://api.groq.com/openai/v1",
+    apiKey,
+  });
+}
 
 const DEFAULT_MARKUP = 2.0;
 
@@ -109,7 +115,7 @@ JSON format:
 
 Sort the array: trending products (isTrending: true) first, then non-trending. trendScore should be 70-99 for trending, 60-75 for non-trending. estimatedDemand: "low", "medium", "high", or "very_high".`;
 
-  const response = await openai.chat.completions.create({
+  const response = await getOpenAIClient().chat.completions.create({
     model: "llama-3.3-70b-versatile",
     max_tokens: 4096,
     messages: [

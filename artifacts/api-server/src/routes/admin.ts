@@ -342,6 +342,11 @@ router.delete("/admin/pending-products/:id", async (req, res): Promise<void> => 
   res.json({ success: true });
 });
 
+router.delete("/admin/pending-products", async (_req, res): Promise<void> => {
+  await db.delete(pendingProductsTable);
+  res.json({ success: true });
+});
+
 router.post("/admin/automation/run", async (_req, res): Promise<void> => {
   const result = await runTrendingAutomation();
   res.json({ success: true, ...result });

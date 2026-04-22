@@ -70,19 +70,24 @@ type AiProduct = {
 };
 
 async function discoverProductsWithAI(existingNames: Set<string>): Promise<AiProduct[]> {
-  const categories = ["Beauty", "Skincare", "Hair Care", "Makeup", "Wellness", "Fitness", "Lifestyle", "Fashion"];
+  const categories = [
+    "Beauty", "Skincare", "Hair Care", "Makeup", "Wellness", "Fitness",
+    "Lifestyle", "Fashion", "Jewelry", "Accessories", "Nail Care",
+    "Body Care", "Fragrance", "Home & Decor", "Self-Care", "Health",
+  ];
   const sources = ["AliExpress", "Amazon", "Alibaba", "DHgate", "Temu"];
 
-  const prompt = `You are a dropshipping product research expert. Find 8 real, purchasable women's products that are either trending or highly rated (4.5+ stars) on platforms like AliExpress, Amazon, Alibaba, DHgate, or Temu.
+  const prompt = `You are a dropshipping product research expert. Find 10 real, purchasable women's products that are currently selling well on platforms like AliExpress, Amazon, Alibaba, DHgate, or Temu.
 
-Mix both trending viral products AND top-rated non-trending products. Not all products need to be trending — include some that are simply well-reviewed staples customers love.
+IMPORTANT: Prioritize trending/viral products first. At least 6 of the 10 should be actively trending right now. The rest can be highly-rated staples (4.5+ stars).
 
-Return ONLY a valid JSON array with exactly 8 products. Each product must:
+Return ONLY a valid JSON array with exactly 10 products, sorted so trending products (isTrending: true) appear FIRST, followed by non-trending. Each product must:
 - Be a REAL product type that actually exists and can be purchased
 - Have a specific, realistic cost price in USD (what the dropshipper pays wholesale)
-- Come from one of these sources: AliExpress, Amazon, Alibaba, DHgate, Temu
+- Come from one of these sources: ${sources.join(", ")}
 - Be in one of these categories: ${categories.join(", ")}
-- NOT be any of these already-known products: ${Array.from(existingNames).slice(0, 20).join(", ")}
+- Span a variety of categories — do NOT put more than 2 products in the same category
+- NOT be any of these already-known products: ${Array.from(existingNames).slice(0, 30).join(", ") || "none"}
 
 JSON format:
 [
@@ -103,7 +108,7 @@ JSON format:
   }
 ]
 
-Make sure to include a variety of sources and categories. trendScore should be 60-99. estimatedDemand: "low", "medium", "high", or "very_high". isTrending: true only if actually viral/trending, false for steady high-rated products.`;
+Sort the array: trending products (isTrending: true) first, then non-trending. trendScore should be 70-99 for trending, 60-75 for non-trending. estimatedDemand: "low", "medium", "high", or "very_high".`;
 
   const response = await openai.chat.completions.create({
     model: "llama-3.3-70b-versatile",

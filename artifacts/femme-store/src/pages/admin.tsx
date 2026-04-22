@@ -384,6 +384,18 @@ function AdminContent({ isAdmin, isLoaded }: { isAdmin: boolean; isLoaded: boole
     }
   }
 
+  async function clearAllPending() {
+    if (!window.confirm("Clear all pending products? This cannot be undone.")) return;
+    try {
+      await apiCall("/api/admin/pending-products", { method: "DELETE" });
+      toast({ title: "Cleared", description: "All pending products removed." });
+      await loadPending();
+      await loadDashboard();
+    } catch (err: any) {
+      toast({ title: "Failed to clear", description: err.message, variant: "destructive" });
+    }
+  }
+
   async function approveProduct(id: number) {
     setLoad(`approve-${id}`, true);
     try {
@@ -723,6 +735,9 @@ function AdminContent({ isAdmin, isLoaded }: { isAdmin: boolean; isLoaded: boole
                 <div className="flex gap-2">
                   <Button variant="outline" size="sm" onClick={loadPending} disabled={loading.pending}>
                     <RefreshCw className={`h-4 w-4 mr-1.5 ${loading.pending ? "animate-spin" : ""}`} /> Refresh
+                  </Button>
+                  <Button variant="outline" size="sm" className="text-red-600 border-red-200 hover:bg-red-50" onClick={clearAllPending} disabled={pendingProducts.length === 0}>
+                    <Trash2 className="h-4 w-4 mr-1.5" /> Clear All
                   </Button>
                   <Button size="sm" className="bg-[#a3485d] hover:bg-[#7d3346] text-white" onClick={runAutomation} disabled={automationRunning}>
                     <Sparkles className={`h-4 w-4 mr-1.5 ${automationRunning ? "animate-spin" : ""}`} />

@@ -2,8 +2,8 @@ import { db, pendingProductsTable } from "@workspace/db";
 import OpenAI from "openai";
 
 const openai = new OpenAI({
-  baseURL: process.env.AI_INTEGRATIONS_OPENAI_BASE_URL,
-  apiKey: process.env.AI_INTEGRATIONS_OPENAI_API_KEY,
+  baseURL: "https://api.groq.com/openai/v1",
+  apiKey: process.env.GROQ_API_KEY,
 });
 
 const DEFAULT_MARKUP = 2.0;
@@ -106,8 +106,8 @@ JSON format:
 Make sure to include a variety of sources and categories. trendScore should be 60-99. estimatedDemand: "low", "medium", "high", or "very_high". isTrending: true only if actually viral/trending, false for steady high-rated products.`;
 
   const response = await openai.chat.completions.create({
-    model: "gpt-5-mini",
-    max_completion_tokens: 4096,
+    model: "llama-3.3-70b-versatile",
+    max_tokens: 4096,
     messages: [
       {
         role: "system",

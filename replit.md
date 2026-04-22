@@ -66,11 +66,27 @@ A high-converting dropshipping storefront targeting women in fashion, beauty, ac
 - `DELETE /api/cart/item/:itemId` — remove item from cart
 - `POST /api/orders` — place an order (clears cart)
 
+### Admin Features
+
+- `/admin` — password-gated admin panel (default: `admin123`)
+- AI product discovery via Groq (`llama-3.3-70b-versatile`) — finds 10 products/run across 9 categories, trending first
+- Pending products tab: approve/reject, "View on Source" link, SUPPLIER/STOCK image badge
+- Clear All button deletes all pending products (`DELETE /admin/pending-products`)
+- 9 categories: Beauty, Skincare, Hair Care, Makeup, Fashion, Accessories, Wellness, Fitness, Lifestyle
+- 2x markup pricing (DEFAULT_MARKUP = 2.0)
+
+### Image Strategy (trendingAutomation.ts)
+
+- Groq asked to provide real supplier CDN image URLs (AliExpress ae-pic-a1.aliexpress-media.com / ae01.alicdn.com, Amazon m.media-amazon.com, Temu)
+- `isSupplierImageUrl()` validates URL hostname; `validateImageUrl()` does HEAD request (4s timeout)
+- If supplier URL valid → use it (shown with green SUPPLIER badge in admin)
+- Otherwise → category-specific curated Unsplash photo (shown with STOCK badge)
+- Brave Image Search API only accessible from code_execution notebook, not from Express server
+
 ### Important Notes
 
 - `lib/api-zod/src/index.ts` only exports from `./generated/api` (not `./generated/types`) to avoid duplicate export conflicts
 - Session IDs are generated in the browser and stored in localStorage
-- Product images use Unsplash URLs for demonstration
 - Vite dev server (`artifacts/femme-store/vite.config.ts`) proxies `/api/*` to `http://localhost:8080` — without this, browser fetches `/api/*` as relative URLs hitting the Vite SPA server which returns HTML (not JSON), causing runtime crashes
 - `resolve.dedupe` includes `@tanstack/react-query` to prevent duplicate React instances across workspace packages
 - Null DB fields (supplierUrl, viralReason, targetAudience, tags) are mapped to `undefined` in `artifacts/api-server/src/routes/products.ts` via `mapProduct()` to satisfy Zod schemas

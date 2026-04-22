@@ -69,6 +69,7 @@ type AiProduct = {
   targetAudience: string;
   isTrending: boolean;
   stockCount: string;
+  imageUrl: string;
   imageKeyword: string;
 };
 
@@ -106,7 +107,8 @@ JSON format:
     "targetAudience": "who buys this",
     "isTrending": true,
     "stockCount": "150",
-    "imageKeyword": "single keyword for product image search"
+    "imageUrl": "a real direct CDN image URL for this product from AliExpress (ae-pic-a1.aliexpress-media.com or ae01.alicdn.com), Amazon (m.media-amazon.com), or Temu. Must be a working .jpg or .webp URL.",
+    "imageKeyword": "2-3 word product description for fallback image search e.g. jade roller face"
   }
 ]
 
@@ -130,38 +132,56 @@ Sort the array: trending products (isTrending: true) first, then non-trending. t
   return products;
 }
 
-function getUnsplashImageUrl(keyword: string): string {
-  const safe = encodeURIComponent(keyword.replace(/[^a-zA-Z0-9 ]/g, "").trim() || "beauty product");
-  return `https://images.unsplash.com/photo-1616394584738-fc6e612e71b9?w=600&q=80&auto=format&fit=crop`;
-}
-
-const IMAGE_MAP: Record<string, string> = {
-  "face mask": "https://images.unsplash.com/photo-1616394584738-fc6e612e71b9?w=600&q=80",
-  "silk pillowcase": "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=600&q=80",
-  "posture corrector": "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=600&q=80",
-  "jade roller": "https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?w=600&q=80",
-  "eyelash": "https://images.unsplash.com/photo-1512207736890-6ffed8a84e8d?w=600&q=80",
-  "waist trainer": "https://images.unsplash.com/photo-1518310383802-640c2de311b2?w=600&q=80",
-  "massage": "https://images.unsplash.com/photo-1607631568010-a87245c0daf8?w=600&q=80",
-  "resistance band": "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=600&q=80",
-  "serum": "https://images.unsplash.com/photo-1526045612212-70caf35c14df?w=600&q=80",
-  "hair": "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=600&q=80",
-  "skincare": "https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?w=600&q=80",
-  "makeup": "https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=600&q=80",
-  "fitness": "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=600&q=80",
-  "wellness": "https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?w=600&q=80",
-  "perfume": "https://images.unsplash.com/photo-1541643600914-78b084683702?w=600&q=80",
-  "nail": "https://images.unsplash.com/photo-1604654894610-df63bc536371?w=600&q=80",
-  "yoga": "https://images.unsplash.com/photo-1575052814086-f385e2e2ad1b?w=600&q=80",
-  "sunscreen": "https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=600&q=80",
+const CATEGORY_FALLBACK_IMAGES: Record<string, string> = {
+  "Beauty":     "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=600&q=80",
+  "Skincare":   "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=600&q=80",
+  "Hair Care":  "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=600&q=80",
+  "Makeup":     "https://images.unsplash.com/photo-1512207736890-6ffed8a84e8d?w=600&q=80",
+  "Fashion":    "https://images.unsplash.com/photo-1558769132-cb1aea458c5e?w=600&q=80",
+  "Accessories":"https://images.unsplash.com/photo-1606760227091-3dd870d97f1d?w=600&q=80",
+  "Wellness":   "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=600&q=80",
+  "Fitness":    "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=600&q=80",
+  "Lifestyle":  "https://images.unsplash.com/photo-1493612276216-ee3925520721?w=600&q=80",
 };
 
-function pickImage(keyword: string): string {
-  const kw = (keyword || "").toLowerCase();
-  for (const [key, url] of Object.entries(IMAGE_MAP)) {
-    if (kw.includes(key)) return url;
+const DEFAULT_FALLBACK = "https://images.unsplash.com/photo-1540553016722-983e48a2cd10?w=600&q=80";
+
+function isSupplierImageUrl(url: string): boolean {
+  try {
+    const host = new URL(url).hostname;
+    return (
+      host.includes("aliexpress-media.com") ||
+      host.includes("alicdn.com") ||
+      host.includes("media-amazon.com") ||
+      host.includes("temu.com") ||
+      host.includes("dhgate.com") ||
+      host.includes("alibaba.com")
+    );
+  } catch {
+    return false;
   }
-  return `https://images.unsplash.com/photo-1540553016722-983e48a2cd10?w=600&q=80`;
+}
+
+async function validateImageUrl(url: string): Promise<boolean> {
+  if (!url || !url.startsWith("http")) return false;
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 4000);
+    const res = await fetch(url, { method: "HEAD", signal: controller.signal });
+    clearTimeout(timeout);
+    const contentType = res.headers.get("content-type") ?? "";
+    return res.ok && contentType.startsWith("image");
+  } catch {
+    return false;
+  }
+}
+
+async function resolveProductImage(aiImageUrl: string, category: string): Promise<string> {
+  if (aiImageUrl && isSupplierImageUrl(aiImageUrl)) {
+    const valid = await validateImageUrl(aiImageUrl);
+    if (valid) return aiImageUrl;
+  }
+  return CATEGORY_FALLBACK_IMAGES[category] ?? DEFAULT_FALLBACK;
 }
 
 export async function runTrendingAutomation(): Promise<{ added: number; skipped: number }> {
@@ -185,7 +205,7 @@ export async function runTrendingAutomation(): Promise<{ added: number; skipped:
     const { sellingPrice, profitMargin } = calculatePricing(costPrice);
     const sourceName = product.source || "AliExpress";
     const supplierUrl = buildSupplierSearchUrl(sourceName, product.name);
-    const imageUrl = pickImage(product.imageKeyword || product.category || "");
+    const imageUrl = await resolveProductImage(product.imageUrl ?? "", product.category);
 
     await db.insert(pendingProductsTable).values({
       name: product.name,

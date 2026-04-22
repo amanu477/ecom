@@ -793,10 +793,22 @@ function AdminContent({ isAdmin, isLoaded }: { isAdmin: boolean; isLoaded: boole
                             <span className="text-xs text-muted-foreground">{products.length} product{products.length !== 1 ? "s" : ""}</span>
                           </div>
                           <div className="grid md:grid-cols-2 gap-3">
-                            {products.map((p) => (
+                            {products.map((p) => {
+                              const isSupplierImg = (() => {
+                                try {
+                                  const h = new URL(p.imageUrl).hostname;
+                                  return h.includes("aliexpress-media.com") || h.includes("alicdn.com") || h.includes("media-amazon.com") || h.includes("temu.com");
+                                } catch { return false; }
+                              })();
+                              return (
                               <Card key={p.id} className={`border-0 shadow-sm overflow-hidden ${p.status !== "pending" ? "opacity-60" : ""}`}>
                                 <div className="flex gap-4 p-4">
-                                  <img src={p.imageUrl} alt={p.name} className="h-20 w-20 rounded-xl object-cover shrink-0" />
+                                  <div className="relative shrink-0">
+                                    <img src={p.imageUrl} alt={p.name} className="h-20 w-20 rounded-xl object-cover" />
+                                    <span className={`absolute -bottom-1 -right-1 text-[9px] font-bold px-1 py-0.5 rounded-full ${isSupplierImg ? "bg-green-500 text-white" : "bg-gray-200 text-gray-600"}`}>
+                                      {isSupplierImg ? "SUPPLIER" : "STOCK"}
+                                    </span>
+                                  </div>
                                   <div className="flex-1 min-w-0">
                                     <div className="flex items-start justify-between gap-2 mb-1">
                                       <h3 className="font-semibold text-sm leading-tight">{p.name}</h3>
@@ -844,7 +856,8 @@ function AdminContent({ isAdmin, isLoaded }: { isAdmin: boolean; isLoaded: boole
                                   </div>
                                 )}
                               </Card>
-                            ))}
+                            );
+                            })}
                           </div>
                         </div>
                       ))}

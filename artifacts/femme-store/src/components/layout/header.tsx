@@ -117,7 +117,9 @@ export function Header() {
   const navLinks = [
     { href: "/products", label: "Shop All" },
     { href: "/products?category=Beauty", label: "Beauty" },
+    { href: "/products?category=Skincare", label: "Skincare" },
     { href: "/products?category=Fashion", label: "Fashion" },
+    { href: "/products?category=Wellness", label: "Wellness" },
   ];
 
   return (

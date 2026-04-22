@@ -147,7 +147,7 @@ export default function Home() {
                   From intelligent skincare to form-flattering wellness accessories, discover our meticulously curated selection.
                 </p>
                 <div className="grid grid-cols-2 gap-4">
-                  {['Beauty', 'Fashion', 'Accessories', 'Wellness'].map((cat) => (
+                  {['Beauty', 'Skincare', 'Fashion', 'Wellness'].map((cat) => (
                     <Link key={cat} href={`/products?category=${cat}`} className="group block">
                       <div className="flex items-center justify-between p-4 rounded-xl border border-border/50 bg-background hover:border-primary/50 transition-colors">
                         <span className="font-medium text-sm tracking-wide">{cat}</span>

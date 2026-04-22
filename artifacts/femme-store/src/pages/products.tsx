@@ -21,7 +21,7 @@ export default function Products() {
   });
 
   const { data: summary } = useGetCatalogSummary();
-  const categories = ["All", "Beauty", "Fashion", "Wellness", "Accessories", "Lifestyle"];
+  const categories = ["All", "Beauty", "Skincare", "Hair Care", "Makeup", "Fashion", "Accessories", "Wellness", "Fitness", "Lifestyle"];
   
   const { data: products, isLoading } = useListProducts(
     activeCategory !== "All" ? { category: activeCategory } : {}

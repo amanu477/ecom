@@ -71,9 +71,8 @@ type AiProduct = {
 
 async function discoverProductsWithAI(existingNames: Set<string>): Promise<AiProduct[]> {
   const categories = [
-    "Beauty", "Skincare", "Hair Care", "Makeup", "Wellness", "Fitness",
-    "Lifestyle", "Fashion", "Jewelry", "Accessories", "Nail Care",
-    "Body Care", "Fragrance", "Home & Decor", "Self-Care", "Health",
+    "Beauty", "Skincare", "Hair Care", "Makeup", "Fashion",
+    "Accessories", "Wellness", "Fitness", "Lifestyle",
   ];
   const sources = ["AliExpress", "Amazon", "Alibaba", "DHgate", "Temu"];
 

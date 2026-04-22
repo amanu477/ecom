@@ -104,7 +104,7 @@ type Order = {
   createdAt: string;
 };
 
-const CATEGORIES = ["Skincare", "Hair Care", "Makeup", "Wellness", "Fitness", "Beauty", "Accessories", "Lifestyle"];
+const CATEGORIES = ["Beauty", "Skincare", "Hair Care", "Makeup", "Fashion", "Accessories", "Wellness", "Fitness", "Lifestyle"];
 const ORDER_STATUSES = ["pending", "processing", "shipped", "delivered", "cancelled"];
 
 const statusColors: Record<string, string> = {

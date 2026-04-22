@@ -19,12 +19,17 @@ import {
 } from "lucide-react";
 
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
+const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD ?? "admin123";
 
 async function apiCall<T = unknown>(path: string, options?: RequestInit): Promise<T> {
   const res = await fetch(`${BASE}${path}`, {
     ...options,
     credentials: "include",
-    headers: { "Content-Type": "application/json", ...(options?.headers ?? {}) },
+    headers: {
+      "Content-Type": "application/json",
+      "X-Admin-Token": ADMIN_PASSWORD,
+      ...(options?.headers ?? {}),
+    },
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({ error: res.statusText }));
@@ -35,7 +40,6 @@ async function apiCall<T = unknown>(path: string, options?: RequestInit): Promis
 
 const ADMIN_EMAIL = import.meta.env.VITE_ADMIN_EMAIL ?? "";
 const clerkAvailable = !!import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
-const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD ?? "admin123";
 
 type DashboardData = {
   summary: {

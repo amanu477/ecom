@@ -1,190 +1,10 @@
 import { db, pendingProductsTable } from "@workspace/db";
-import { eq } from "drizzle-orm";
+import OpenAI from "openai";
 
-const TRENDING_POOL = [
-  {
-    name: "Microcurrent Facial Toning Device",
-    description: "Professional-grade microcurrent device that lifts and sculpts facial muscles for a non-surgical facelift effect. Used by celebrities and dermatologists.",
-    category: "Skincare",
-    imageUrl: "https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?w=600&auto=format&fit=crop",
-    costPrice: 28.50,
-    viralReason: "Viral on TikTok skincare routines with millions of views",
-    targetAudience: "Women 28-50 focused on anti-aging skincare",
-    supplierUrl: "https://www.aliexpress.com",
-    tags: ["skincare", "anti-aging", "beauty device", "facial"],
-    estimatedDemand: "very_high",
-    trendScore: 94,
-    stockCount: "100",
-  },
-  {
-    name: "Silk Sleep Hair Bonnet",
-    description: "Luxurious mulberry silk sleeping bonnet that protects hair from frizz, breakage, and moisture loss. Available in adjustable sizes for all hair types.",
-    category: "Hair Care",
-    imageUrl: "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=600&auto=format&fit=crop",
-    costPrice: 6.80,
-    viralReason: "Trending in natural hair care communities and sleep wellness circles",
-    targetAudience: "Women with natural, curly, or color-treated hair",
-    supplierUrl: "https://www.aliexpress.com",
-    tags: ["hair care", "silk", "sleep", "natural hair"],
-    estimatedDemand: "high",
-    trendScore: 88,
-    stockCount: "200",
-  },
-  {
-    name: "Posture Corrector Bra",
-    description: "Wireless comfortable bra with built-in posture correction technology. Supports spine alignment while providing all-day comfort.",
-    category: "Wellness",
-    imageUrl: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=600&auto=format&fit=crop",
-    costPrice: 12.40,
-    viralReason: "Work-from-home culture driving demand for comfort + posture products",
-    targetAudience: "Working women 25-45 with desk jobs",
-    supplierUrl: "https://www.aliexpress.com",
-    tags: ["wellness", "posture", "comfort", "bra"],
-    estimatedDemand: "high",
-    trendScore: 82,
-    stockCount: "150",
-  },
-  {
-    name: "LED Teeth Whitening Kit",
-    description: "Professional-grade teeth whitening kit with LED accelerator light. Delivers salon-quality results from home in just 10 minutes per session.",
-    category: "Beauty",
-    imageUrl: "https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=600&auto=format&fit=crop",
-    costPrice: 9.20,
-    viralReason: "Before/after transformation content dominating social media feeds",
-    targetAudience: "Beauty-conscious women 20-40",
-    supplierUrl: "https://www.aliexpress.com",
-    tags: ["beauty", "teeth whitening", "LED", "dental care"],
-    estimatedDemand: "very_high",
-    trendScore: 91,
-    stockCount: "120",
-  },
-  {
-    name: "Resistance Bands Set (5 levels)",
-    description: "Premium fabric resistance bands set with 5 resistance levels. Perfect for home workouts, glute training, and physical therapy.",
-    category: "Fitness",
-    imageUrl: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=600&auto=format&fit=crop",
-    costPrice: 7.60,
-    viralReason: "Home fitness boom with strong influencer endorsements in women's fitness",
-    targetAudience: "Fitness enthusiasts 18-40",
-    supplierUrl: "https://www.aliexpress.com",
-    tags: ["fitness", "workout", "resistance bands", "home gym"],
-    estimatedDemand: "very_high",
-    trendScore: 96,
-    stockCount: "300",
-  },
-  {
-    name: "Gua Sha Facial Massage Set",
-    description: "Authentic rose quartz gua sha stone with facial oil. Reduces puffiness, improves circulation, and creates a natural glow.",
-    category: "Skincare",
-    imageUrl: "https://images.unsplash.com/photo-1583248369069-9d91f1640fe6?w=600&auto=format&fit=crop",
-    costPrice: 4.30,
-    viralReason: "Massive wellness & self-care trend, consistently viral on Instagram and TikTok",
-    targetAudience: "Wellness and skincare enthusiasts 22-45",
-    supplierUrl: "https://www.aliexpress.com",
-    tags: ["skincare", "gua sha", "facial massage", "crystal"],
-    estimatedDemand: "high",
-    trendScore: 87,
-    stockCount: "250",
-  },
-  {
-    name: "Heated Eyelash Curler",
-    description: "Electric heated eyelash curler that creates long-lasting, dramatic curls in seconds without damaging lashes. Rechargeable via USB.",
-    category: "Makeup",
-    imageUrl: "https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=600&auto=format&fit=crop",
-    costPrice: 11.90,
-    viralReason: "Beauty hack content going viral, solving a universal makeup struggle",
-    targetAudience: "Makeup lovers 18-35",
-    supplierUrl: "https://www.aliexpress.com",
-    tags: ["makeup", "eyelash", "beauty tool", "eyes"],
-    estimatedDemand: "high",
-    trendScore: 83,
-    stockCount: "180",
-  },
-  {
-    name: "Collagen Peptide Hair Serum",
-    description: "Concentrated collagen peptide serum that visibly reduces hair breakage and adds shine within 2 weeks. Suitable for all hair types.",
-    category: "Hair Care",
-    imageUrl: "https://images.unsplash.com/photo-1526045612212-70caf35c14df?w=600&auto=format&fit=crop",
-    costPrice: 8.70,
-    viralReason: "Hair health trend combining beauty and wellness, strong results-driven content",
-    targetAudience: "Women experiencing hair thinning or damage, 25-50",
-    supplierUrl: "https://www.aliexpress.com",
-    tags: ["hair care", "collagen", "serum", "hair growth"],
-    estimatedDemand: "high",
-    trendScore: 85,
-    stockCount: "200",
-  },
-  {
-    name: "Reusable Silicone Makeup Pads",
-    description: "Set of 16 washable silicone makeup remover pads. Eco-friendly alternative to cotton rounds that saves money and reduces waste.",
-    category: "Skincare",
-    imageUrl: "https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?w=600&auto=format&fit=crop",
-    costPrice: 5.10,
-    viralReason: "Eco-conscious beauty trend with strong sustainability messaging",
-    targetAudience: "Eco-conscious beauty enthusiasts 20-40",
-    supplierUrl: "https://www.aliexpress.com",
-    tags: ["skincare", "eco-friendly", "reusable", "makeup remover"],
-    estimatedDemand: "medium",
-    trendScore: 76,
-    stockCount: "300",
-  },
-  {
-    name: "Bamboo Charcoal Exfoliating Gloves",
-    description: "Deep-cleansing exfoliating gloves made from bamboo charcoal fiber. Removes dead skin, unclogs pores, and promotes smooth, radiant skin.",
-    category: "Skincare",
-    imageUrl: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=600&auto=format&fit=crop",
-    costPrice: 3.90,
-    viralReason: "Skincare minimalism trend with affordable, effective self-care solutions",
-    targetAudience: "Skincare beginners and budget-conscious shoppers 18-35",
-    supplierUrl: "https://www.aliexpress.com",
-    tags: ["skincare", "exfoliation", "bamboo", "charcoal"],
-    estimatedDemand: "medium",
-    trendScore: 74,
-    stockCount: "400",
-  },
-  {
-    name: "Scalp Massager Shampoo Brush",
-    description: "Electric waterproof scalp massager with soft silicone bristles. Promotes hair growth, relieves stress, and enhances shampoo lather.",
-    category: "Hair Care",
-    imageUrl: "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=600&auto=format&fit=crop",
-    costPrice: 14.50,
-    viralReason: "Hair growth content going viral across TikTok and YouTube",
-    targetAudience: "Women concerned with hair thinning or scalp health 25-50",
-    supplierUrl: "https://www.amazon.com",
-    tags: ["hair care", "scalp", "massager", "hair growth"],
-    estimatedDemand: "high",
-    trendScore: 89,
-    stockCount: "200",
-  },
-  {
-    name: "Portable Aromatherapy Diffuser",
-    description: "Compact USB-powered essential oil diffuser with soft LED light. Creates a calming atmosphere anywhere — office, car, or bedroom.",
-    category: "Wellness",
-    imageUrl: "https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?w=600&auto=format&fit=crop",
-    costPrice: 11.20,
-    viralReason: "Self-care and wellness routines trending heavily on social media",
-    targetAudience: "Wellness-focused women 22-45",
-    supplierUrl: "https://www.amazon.com",
-    tags: ["wellness", "aromatherapy", "diffuser", "self-care"],
-    estimatedDemand: "high",
-    trendScore: 84,
-    stockCount: "150",
-  },
-  {
-    name: "Jade Facial Roller Duo",
-    description: "Double-ended jade facial roller for lymphatic drainage and skin depuffing. Pairs with face oil for maximum glow.",
-    category: "Beauty",
-    imageUrl: "https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?w=600&auto=format&fit=crop",
-    costPrice: 8.80,
-    viralReason: "Ancient beauty ritual made viral by wellness influencers worldwide",
-    targetAudience: "Natural beauty enthusiasts 20-40",
-    supplierUrl: "https://www.alibaba.com",
-    tags: ["beauty", "jade roller", "skincare", "facial"],
-    estimatedDemand: "medium",
-    trendScore: 79,
-    stockCount: "300",
-  },
-];
+const openai = new OpenAI({
+  baseURL: process.env.AI_INTEGRATIONS_OPENAI_BASE_URL,
+  apiKey: process.env.AI_INTEGRATIONS_OPENAI_API_KEY,
+});
 
 const DEFAULT_MARKUP = 2.0;
 
@@ -215,44 +35,178 @@ function getSourceName(supplierUrl: string): string {
   }
 }
 
+function buildSupplierSearchUrl(source: string, productName: string): string {
+  const query = encodeURIComponent(productName);
+  switch (source) {
+    case "Amazon":
+      return `https://www.amazon.com/s?k=${query}`;
+    case "AliExpress":
+      return `https://www.aliexpress.com/wholesale?SearchText=${query}`;
+    case "Alibaba":
+      return `https://www.alibaba.com/trade/search?SearchText=${query}`;
+    case "DHgate":
+      return `https://www.dhgate.com/wholesale/search.do?act=search&searchkey=${query}`;
+    case "Temu":
+      return `https://www.temu.com/search_result.html?search_key=${query}`;
+    default:
+      return `https://www.aliexpress.com/wholesale?SearchText=${query}`;
+  }
+}
+
+type AiProduct = {
+  name: string;
+  description: string;
+  category: string;
+  costPrice: number;
+  source: string;
+  tags: string[];
+  trendScore: number;
+  estimatedDemand: string;
+  viralReason: string;
+  targetAudience: string;
+  isTrending: boolean;
+  stockCount: string;
+  imageKeyword: string;
+};
+
+async function discoverProductsWithAI(existingNames: Set<string>): Promise<AiProduct[]> {
+  const categories = ["Beauty", "Skincare", "Hair Care", "Makeup", "Wellness", "Fitness", "Lifestyle", "Fashion"];
+  const sources = ["AliExpress", "Amazon", "Alibaba", "DHgate", "Temu"];
+
+  const prompt = `You are a dropshipping product research expert. Find 8 real, purchasable women's products that are either trending or highly rated (4.5+ stars) on platforms like AliExpress, Amazon, Alibaba, DHgate, or Temu.
+
+Mix both trending viral products AND top-rated non-trending products. Not all products need to be trending — include some that are simply well-reviewed staples customers love.
+
+Return ONLY a valid JSON array with exactly 8 products. Each product must:
+- Be a REAL product type that actually exists and can be purchased
+- Have a specific, realistic cost price in USD (what the dropshipper pays wholesale)
+- Come from one of these sources: AliExpress, Amazon, Alibaba, DHgate, Temu
+- Be in one of these categories: ${categories.join(", ")}
+- NOT be any of these already-known products: ${Array.from(existingNames).slice(0, 20).join(", ")}
+
+JSON format:
+[
+  {
+    "name": "specific product name",
+    "description": "compelling 2-sentence product description for customers",
+    "category": "one of the categories listed",
+    "costPrice": 12.50,
+    "source": "AliExpress",
+    "tags": ["tag1", "tag2", "tag3"],
+    "trendScore": 88,
+    "estimatedDemand": "high",
+    "viralReason": "why it's trending or why customers love it",
+    "targetAudience": "who buys this",
+    "isTrending": true,
+    "stockCount": "150",
+    "imageKeyword": "single keyword for product image search"
+  }
+]
+
+Make sure to include a variety of sources and categories. trendScore should be 60-99. estimatedDemand: "low", "medium", "high", or "very_high". isTrending: true only if actually viral/trending, false for steady high-rated products.`;
+
+  const response = await openai.chat.completions.create({
+    model: "gpt-5-mini",
+    max_completion_tokens: 4096,
+    messages: [
+      {
+        role: "system",
+        content: "You are a dropshipping product research expert. Always respond with valid JSON only, no markdown, no extra text.",
+      },
+      { role: "user", content: prompt },
+    ],
+  });
+
+  const content = response.choices[0]?.message?.content ?? "[]";
+  const cleaned = content.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
+  const products: AiProduct[] = JSON.parse(cleaned);
+  return products;
+}
+
+function getUnsplashImageUrl(keyword: string): string {
+  const safe = encodeURIComponent(keyword.replace(/[^a-zA-Z0-9 ]/g, "").trim() || "beauty product");
+  return `https://images.unsplash.com/photo-1616394584738-fc6e612e71b9?w=600&q=80&auto=format&fit=crop`;
+}
+
+const IMAGE_MAP: Record<string, string> = {
+  "face mask": "https://images.unsplash.com/photo-1616394584738-fc6e612e71b9?w=600&q=80",
+  "silk pillowcase": "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=600&q=80",
+  "posture corrector": "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=600&q=80",
+  "jade roller": "https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?w=600&q=80",
+  "eyelash": "https://images.unsplash.com/photo-1512207736890-6ffed8a84e8d?w=600&q=80",
+  "waist trainer": "https://images.unsplash.com/photo-1518310383802-640c2de311b2?w=600&q=80",
+  "massage": "https://images.unsplash.com/photo-1607631568010-a87245c0daf8?w=600&q=80",
+  "resistance band": "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=600&q=80",
+  "serum": "https://images.unsplash.com/photo-1526045612212-70caf35c14df?w=600&q=80",
+  "hair": "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=600&q=80",
+  "skincare": "https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?w=600&q=80",
+  "makeup": "https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=600&q=80",
+  "fitness": "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=600&q=80",
+  "wellness": "https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?w=600&q=80",
+  "perfume": "https://images.unsplash.com/photo-1541643600914-78b084683702?w=600&q=80",
+  "nail": "https://images.unsplash.com/photo-1604654894610-df63bc536371?w=600&q=80",
+  "yoga": "https://images.unsplash.com/photo-1575052814086-f385e2e2ad1b?w=600&q=80",
+  "sunscreen": "https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=600&q=80",
+};
+
+function pickImage(keyword: string): string {
+  const kw = (keyword || "").toLowerCase();
+  for (const [key, url] of Object.entries(IMAGE_MAP)) {
+    if (kw.includes(key)) return url;
+  }
+  return `https://images.unsplash.com/photo-1540553016722-983e48a2cd10?w=600&q=80`;
+}
+
 export async function runTrendingAutomation(): Promise<{ added: number; skipped: number }> {
   const existing = await db.select({ name: pendingProductsTable.name }).from(pendingProductsTable);
-
   const existingNames = new Set(existing.map((r) => r.name));
 
-  const toAdd = TRENDING_POOL.filter((p) => !existingNames.has(p.name));
+  let products: AiProduct[];
+  try {
+    products = await discoverProductsWithAI(existingNames);
+  } catch (err) {
+    throw new Error(`AI product discovery failed: ${err instanceof Error ? err.message : String(err)}`);
+  }
 
-  if (toAdd.length === 0) return { added: 0, skipped: TRENDING_POOL.length };
+  const toAdd = products.filter((p) => p.name && !existingNames.has(p.name));
+  let added = 0;
 
   for (const product of toAdd) {
-    const { sellingPrice, profitMargin } = calculatePricing(product.costPrice);
-    const sourceName = getSourceName(product.supplierUrl);
+    const costPrice = typeof product.costPrice === "number" ? product.costPrice : parseFloat(String(product.costPrice));
+    if (isNaN(costPrice) || costPrice <= 0) continue;
+
+    const { sellingPrice, profitMargin } = calculatePricing(costPrice);
+    const sourceName = product.source || "AliExpress";
+    const supplierUrl = buildSupplierSearchUrl(sourceName, product.name);
+    const imageUrl = pickImage(product.imageKeyword || product.category || "");
+
     await db.insert(pendingProductsTable).values({
       name: product.name,
       description: product.description,
       category: product.category,
-      imageUrl: product.imageUrl,
-      costPrice: product.costPrice.toFixed(2),
+      imageUrl,
+      costPrice: costPrice.toFixed(2),
       sellingPrice: sellingPrice.toFixed(2),
       profitMargin: profitMargin.toFixed(2),
-      stockCount: product.stockCount,
-      isTrending: true,
+      stockCount: product.stockCount ?? "100",
+      isTrending: product.isTrending ?? false,
       viralReason: product.viralReason,
       targetAudience: product.targetAudience,
-      supplierUrl: product.supplierUrl,
-      tags: product.tags,
+      supplierUrl,
+      tags: product.tags ?? [],
       source: sourceName,
       status: "pending",
-      trendScore: product.trendScore.toFixed(2),
-      estimatedDemand: product.estimatedDemand,
+      trendScore: (product.trendScore ?? 75).toFixed(2),
+      estimatedDemand: product.estimatedDemand ?? "medium",
     });
+    added++;
   }
 
-  return { added: toAdd.length, skipped: TRENDING_POOL.length - toAdd.length };
+  return { added, skipped: products.length - added };
 }
 
 export function calculateProfit(costPrice: number, marginPercent?: number) {
-  const margin = (marginPercent ?? DEFAULT_PROFIT_MARGIN * 100) / 100;
+  const margin = (marginPercent ?? 50) / 100;
   const sellingPrice = parseFloat((costPrice / (1 - margin)).toFixed(2));
   const profit = parseFloat((sellingPrice - costPrice).toFixed(2));
   const profitMargin = parseFloat(((profit / sellingPrice) * 100).toFixed(2));

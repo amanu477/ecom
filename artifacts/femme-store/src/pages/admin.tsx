@@ -800,6 +800,16 @@ function AdminContent({ isAdmin, isLoaded }: { isAdmin: boolean; isLoaded: boole
                                     {p.targetAudience && (
                                       <p className="text-xs text-muted-foreground line-clamp-1">👥 {p.targetAudience}</p>
                                     )}
+                                    {p.supplierUrl && (
+                                      <a
+                                        href={p.supplierUrl}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="inline-flex items-center gap-1 text-xs text-blue-600 hover:underline mt-1"
+                                      >
+                                        <Eye className="h-3 w-3" /> View on {p.source || "Source"}
+                                      </a>
+                                    )}
                                   </div>
                                 </div>
                                 {p.status === "pending" && (

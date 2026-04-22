@@ -142,19 +142,81 @@ const TRENDING_POOL = [
     trendScore: 74,
     stockCount: "400",
   },
+  {
+    name: "Scalp Massager Shampoo Brush",
+    description: "Electric waterproof scalp massager with soft silicone bristles. Promotes hair growth, relieves stress, and enhances shampoo lather.",
+    category: "Hair Care",
+    imageUrl: "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=600&auto=format&fit=crop",
+    costPrice: 14.50,
+    viralReason: "Hair growth content going viral across TikTok and YouTube",
+    targetAudience: "Women concerned with hair thinning or scalp health 25-50",
+    supplierUrl: "https://www.amazon.com",
+    tags: ["hair care", "scalp", "massager", "hair growth"],
+    estimatedDemand: "high",
+    trendScore: 89,
+    stockCount: "200",
+  },
+  {
+    name: "Portable Aromatherapy Diffuser",
+    description: "Compact USB-powered essential oil diffuser with soft LED light. Creates a calming atmosphere anywhere — office, car, or bedroom.",
+    category: "Wellness",
+    imageUrl: "https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?w=600&auto=format&fit=crop",
+    costPrice: 11.20,
+    viralReason: "Self-care and wellness routines trending heavily on social media",
+    targetAudience: "Wellness-focused women 22-45",
+    supplierUrl: "https://www.amazon.com",
+    tags: ["wellness", "aromatherapy", "diffuser", "self-care"],
+    estimatedDemand: "high",
+    trendScore: 84,
+    stockCount: "150",
+  },
+  {
+    name: "Jade Facial Roller Duo",
+    description: "Double-ended jade facial roller for lymphatic drainage and skin depuffing. Pairs with face oil for maximum glow.",
+    category: "Beauty",
+    imageUrl: "https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?w=600&auto=format&fit=crop",
+    costPrice: 8.80,
+    viralReason: "Ancient beauty ritual made viral by wellness influencers worldwide",
+    targetAudience: "Natural beauty enthusiasts 20-40",
+    supplierUrl: "https://www.alibaba.com",
+    tags: ["beauty", "jade roller", "skincare", "facial"],
+    estimatedDemand: "medium",
+    trendScore: 79,
+    stockCount: "300",
+  },
 ];
 
-const DEFAULT_PROFIT_MARGIN = 0.65;
+const DEFAULT_MARKUP = 2.0;
 
 function calculatePricing(costPrice: number) {
-  const sellingPrice = parseFloat((costPrice / (1 - DEFAULT_PROFIT_MARGIN)).toFixed(2));
+  const sellingPrice = parseFloat((costPrice * DEFAULT_MARKUP).toFixed(2));
   const profitMargin = parseFloat((((sellingPrice - costPrice) / sellingPrice) * 100).toFixed(2));
   return { sellingPrice, profitMargin };
 }
 
+function getSourceName(supplierUrl: string): string {
+  try {
+    const hostname = new URL(supplierUrl).hostname.replace("www.", "");
+    const known: Record<string, string> = {
+      "aliexpress.com": "AliExpress",
+      "amazon.com": "Amazon",
+      "amazon.co.uk": "Amazon UK",
+      "amazon.ca": "Amazon CA",
+      "alibaba.com": "Alibaba",
+      "dhgate.com": "DHgate",
+      "ebay.com": "eBay",
+      "walmart.com": "Walmart",
+      "etsy.com": "Etsy",
+      "temu.com": "Temu",
+    };
+    return known[hostname] ?? hostname;
+  } catch {
+    return supplierUrl;
+  }
+}
+
 export async function runTrendingAutomation(): Promise<{ added: number; skipped: number }> {
-  const existing = await db.select({ name: pendingProductsTable.name }).from(pendingProductsTable)
-    .where(eq(pendingProductsTable.source, "automation"));
+  const existing = await db.select({ name: pendingProductsTable.name }).from(pendingProductsTable);
 
   const existingNames = new Set(existing.map((r) => r.name));
 
@@ -164,6 +226,7 @@ export async function runTrendingAutomation(): Promise<{ added: number; skipped:
 
   for (const product of toAdd) {
     const { sellingPrice, profitMargin } = calculatePricing(product.costPrice);
+    const sourceName = getSourceName(product.supplierUrl);
     await db.insert(pendingProductsTable).values({
       name: product.name,
       description: product.description,
@@ -178,7 +241,7 @@ export async function runTrendingAutomation(): Promise<{ added: number; skipped:
       targetAudience: product.targetAudience,
       supplierUrl: product.supplierUrl,
       tags: product.tags,
-      source: "automation",
+      source: sourceName,
       status: "pending",
       trendScore: product.trendScore.toFixed(2),
       estimatedDemand: product.estimatedDemand,

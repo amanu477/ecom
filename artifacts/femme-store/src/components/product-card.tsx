@@ -58,9 +58,6 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
               
               <div className="mt-auto flex items-center justify-between">
                 <div className="flex flex-col">
-                  <span className="text-muted-foreground text-xs line-through mb-0.5">
-                    ${product.costPrice.toFixed(2)}
-                  </span>
                   <span className="text-lg font-bold text-foreground">
                     ${product.sellingPrice.toFixed(2)}
                   </span>
